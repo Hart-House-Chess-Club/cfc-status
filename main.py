@@ -15,7 +15,7 @@ def read_from_file():
     # information of the event
     event_date = datetime(2022,12,11) # date of the event
     # event_date = datetime.now() # if the event is today
-    file_path = "holidaysOpenOct13.csv" # file to read. First 3 csv columns must be what we want to keep
+    file_path = "resources/holidaysOpenOct13.csv"  # file to read. First 3 csv columns must be what we want to keep
     cfc_id_index = 2 # index of the id number. Assume everything to the left of the index is what we want to keep
 
     id_list = []
