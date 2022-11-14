@@ -29,6 +29,9 @@ def read_from_file():
             # iterate through each row
             print(row)
             cfc_id = row[cfc_id_index] # the location of the csv file
+
+            if not row[0]: continue # skip empty values
+
             data_to_write = row[0:cfc_id_index] # we want to keep the first few indices
             if cfc_id != '': # if the id is not empty
                 id_list.append(cfc_id)
