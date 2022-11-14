@@ -16,12 +16,13 @@ def read_from_file():
     # information of the event
     event_date = datetime(2022, 12, 11)  # date of the event
     # event_date = datetime.now() # if the event is today
-    file_path = "resources/holidays.csv"  # file to read. First 3 csv columns must be what we want to keep
+    file_path = "resources/"  # file to read. First 3 csv columns must be what we want to keep
+    file_name = "holidays.csv"
     cfc_id_index = 2  # index of the id number. Assume everything to the left of the index is what we want to keep
 
     id_list = []
 
-    with open(file_path, 'r') as f:
+    with open(file_path + file_name, 'r') as f:
         csv_reader = reader(f)
         header = next(csv_reader)  # skip the header
 
@@ -50,6 +51,7 @@ def read_from_file():
 
                 # add current rating of player to the end of the list
                 data_to_write.append(get_profile(cfc_id)["player"]["regular_rating"])
+                data_to_write += row[cfc_id_index + 2:] # add remaining indexes
                 print(data_to_write)
 
             new_csv_rows.append(data_to_write)
@@ -58,11 +60,11 @@ def read_from_file():
     f.close()
 
     new_header = header[0:cfc_id_index + 1] + ["CFC Membership"] + [
-        "CFC Rating"]  # new header based on what we want to print
+        "CFC Rating"] + header[cfc_id_index + 2:]  # new header based on what we want to print
     sorted_data = sort_by_rating(new_csv_rows,
                                  cfc_id_index + 2)  # sort by the index of the rating. Rating index is 2 above the CFC index
     print(sorted_data)
-    write_to_file("updated_" + file_path, new_header, sorted_data)
+    write_to_file(file_path + "updated_" + file_name, new_header, sorted_data)
 
 
 def write_to_file(filename, header, contents):
