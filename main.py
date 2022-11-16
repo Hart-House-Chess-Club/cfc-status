@@ -33,13 +33,22 @@ def read_from_file():
             print(row)
             cfc_id = row[cfc_id_index]  # the location of the csv file
 
-            if not row[0]: continue  # skip empty values
+            if not row[0]:
+                continue  # skip empty values
 
             data_to_write = row[0:cfc_id_index + 1]  # we want to keep the first few indices
             if cfc_id != '':  # if the id is not empty
+                if(cfc_id in id_list): continue
                 id_list.append(cfc_id)
+                print(cfc_id)
 
-                cfc_expiry = get_profile(cfc_id)["player"]["cfc_expiry"]
+                profile = get_profile(cfc_id)
+
+                if(profile["player"]["events"] == []):
+                    data_to_write.append("Unr")
+                    continue
+
+                cfc_expiry = profile["player"]["cfc_expiry"]
                 if not cfc_expiry.strip():
                     data_to_write.append("NA")
                 else:
@@ -50,8 +59,11 @@ def read_from_file():
                         data_to_write.append("Valid")
 
                 # add current rating of player to the end of the list
-                data_to_write.append(get_profile(cfc_id)["player"]["regular_rating"])
-                data_to_write += row[cfc_id_index + 2:] # add remaining indexes
+                data_to_write.append(profile["player"]["regular_rating"])
+                data_to_write.append(profile["player"]["fide_id"])
+                data_to_write.append(profile["player"]["name_first"])
+                data_to_write.append(profile["player"]["name_last"])
+                data_to_write += row[cfc_id_index + 2:]  # add remaining indexes
                 print(data_to_write)
 
             new_csv_rows.append(data_to_write)
@@ -60,10 +72,11 @@ def read_from_file():
     f.close()
 
     new_header = header[0:cfc_id_index + 1] + ["CFC Membership"] + [
-        "CFC Rating"] + header[cfc_id_index + 2:]  # new header based on what we want to print
+        "CFC Rating"] + ["FIDE ID"] + ["First Name"] + ["Last Name"] + header[cfc_id_index + 2:]  # new header based on what we want to print
     sorted_data = sort_by_rating(new_csv_rows,
                                  cfc_id_index + 2)  # sort by the index of the rating. Rating index is 2 above the CFC index
     print(sorted_data)
+    # sorted_data = list(dict.fromkeys(sorted_data))  # remove duplicates
     write_to_file(file_path + "updated_" + file_name, new_header, sorted_data)
 
 
