@@ -18,7 +18,7 @@ def read_from_file():
     # event_date = datetime.now() # if the event is today
     file_path = "resources/"  # file to read. First 3 csv columns must be what we want to keep
     file_name = "holidays.csv"
-    cfc_id_index = 2  # index of the id number. Assume everything to the left of the index is what we want to keep
+    cfc_id_index = 3  # index of the id number. Assume everything to the left of the index is what we want to keep
 
     id_list = []
 
@@ -33,20 +33,33 @@ def read_from_file():
             print(row)
             cfc_id = row[cfc_id_index]  # the location of the csv file
 
-            if not row[0]:
-                continue  # skip empty values
+            # if not row[0]:
+            #     continue  # skip empty values
 
             data_to_write = row[0:cfc_id_index + 1]  # we want to keep the first few indices
             if cfc_id != '':  # if the id is not empty
-                if(cfc_id in id_list): continue
+
+                if cfc_id == "NA":
+                    data_to_write.append("0")
+                    data_to_write += [] + [] + [] + row[cfc_id_index + 2:]  # add remaining indexes
+                    print(data_to_write)
+                    new_csv_rows.append(data_to_write)
+                    continue
+
+                if cfc_id in id_list: continue
                 id_list.append(cfc_id)
                 print(cfc_id)
 
                 profile = get_profile(cfc_id)
 
-                if(profile["player"]["events"] == []):
-                    data_to_write.append("Unr")
+                if profile["player"]["events"] == []:
+                    data_to_write.append("0")
+                    data_to_write += [] + [] + [] + row[cfc_id_index + 2:]  # add remaining indexes
+                    print(data_to_write)
+                    new_csv_rows.append(data_to_write)
                     continue
+                else:
+                    data_to_write.append(profile["player"]["regular_rating"])
 
                 cfc_expiry = profile["player"]["cfc_expiry"]
                 if not cfc_expiry.strip():
@@ -59,22 +72,21 @@ def read_from_file():
                         data_to_write.append("Valid")
 
                 # add current rating of player to the end of the list
-                data_to_write.append(profile["player"]["regular_rating"])
                 data_to_write.append(profile["player"]["fide_id"])
                 data_to_write.append(profile["player"]["name_first"])
                 data_to_write.append(profile["player"]["name_last"])
-                data_to_write += row[cfc_id_index + 2:]  # add remaining indexes
+                data_to_write += row[cfc_id_index + 4:]  # add remaining indexes
                 print(data_to_write)
 
-            new_csv_rows.append(data_to_write)
+                new_csv_rows.append(data_to_write)
 
     print(new_csv_rows)
     f.close()
 
-    new_header = header[0:cfc_id_index + 1] + ["CFC Membership"] + [
-        "CFC Rating"] + ["FIDE ID"] + ["First Name"] + ["Last Name"] + header[cfc_id_index + 2:]  # new header based on what we want to print
+    new_header = header[0:cfc_id_index + 1] + [
+        "CFC Rating"] + ["CFC Membership"] + ["FIDE ID"] + ["First Name"] + ["Last Name"] + header[cfc_id_index + 4:]  # new header based on what we want to print
     sorted_data = sort_by_rating(new_csv_rows,
-                                 cfc_id_index + 2)  # sort by the index of the rating. Rating index is 2 above the CFC index
+                                 cfc_id_index + 1)  # sort by the index of the rating. Rating index is 1 above the CFC index
     print(sorted_data)
     # sorted_data = list(dict.fromkeys(sorted_data))  # remove duplicates
     write_to_file(file_path + "updated_" + file_name, new_header, sorted_data)
@@ -92,7 +104,7 @@ def write_to_file(filename, header, contents):
 
 def sort_by_rating(data, ratings_index):
     # sorts the data by ratings and updates the rank of the players
-    data.sort(key=lambda row: row[ratings_index], reverse=True)
+    data.sort(key=lambda row: int(row[ratings_index]), reverse=True)
 
     rankings_number = 1
     for line in data:
