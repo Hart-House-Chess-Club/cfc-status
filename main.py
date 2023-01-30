@@ -14,11 +14,11 @@ def get_profile(cfcid):
 def read_from_file():
     # file is recommend to be in the following format: starting rank, Name of Player, CFC ID
     # information of the event
-    event_date = datetime(2022, 12, 11)  # date of the event
+    event_date = datetime(2022, 3, 18)  # date of the event
     # event_date = datetime.now() # if the event is today
     file_path = "resources/"  # file to read. First 3 csv columns must be what we want to keep
-    file_name = "holidays.csv"
-    cfc_id_index = 3  # index of the id number. Assume everything to the left of the index is what we want to keep
+    file_name = "readingweek.csv"
+    cfc_id_index = 2  # index of the id number. Assume everything to the left of the index is what we want to keep
 
     id_list = []
 
@@ -41,7 +41,7 @@ def read_from_file():
 
                 if cfc_id == "NA":
                     data_to_write.append("0")
-                    data_to_write += [] + [] + [] + row[cfc_id_index + 2:]  # add remaining indexes
+                    data_to_write += [" "] * 4 + row[cfc_id_index + 1:]  # add remaining indexes
                     print(data_to_write)
                     new_csv_rows.append(data_to_write)
                     continue
@@ -54,7 +54,7 @@ def read_from_file():
 
                 if profile["player"]["events"] == []:
                     data_to_write.append("0")
-                    data_to_write += [] + [] + [] + row[cfc_id_index + 2:]  # add remaining indexes
+                    data_to_write += [" "] * 4 + row[cfc_id_index + 1:]  # add remaining indexes
                     print(data_to_write)
                     new_csv_rows.append(data_to_write)
                     continue
@@ -75,7 +75,7 @@ def read_from_file():
                 data_to_write.append(profile["player"]["fide_id"])
                 data_to_write.append(profile["player"]["name_first"])
                 data_to_write.append(profile["player"]["name_last"])
-                data_to_write += row[cfc_id_index + 4:]  # add remaining indexes
+                data_to_write += row[cfc_id_index + 1:]  # add remaining indexes
                 print(data_to_write)
 
                 new_csv_rows.append(data_to_write)
