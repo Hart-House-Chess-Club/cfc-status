@@ -39,7 +39,7 @@ def read_from_file():
             data_to_write = row[0:cfc_id_index + 1]  # we want to keep the first few indices
             if cfc_id != '':  # if the id is not empty
 
-                if cfc_id == "NA":
+                if cfc_id.lower() == "na" or cfc_id.lower() == "n/a":
                     data_to_write.append("0")
                     data_to_write += [] + [] + [] + row[cfc_id_index + 2:]  # add remaining indexes
                     print(data_to_write)
